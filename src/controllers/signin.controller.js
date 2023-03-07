@@ -24,6 +24,4 @@ async function signin(request, response, next) {
   }
 };
 
-export {
-  signin,
-};
+export default signin;

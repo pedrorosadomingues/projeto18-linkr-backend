@@ -59,6 +59,4 @@ async function signup(request, response) {
   }
 };
 
-export {
-  signup,
-}
+export default signup;
