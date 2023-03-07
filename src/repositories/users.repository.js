@@ -4,6 +4,10 @@ export async function getUserRepository(email) {
   return await connection.query('SELECT * FROM users WHERE email=$1', [email]);
 };
 
+export async function findUserById(id) {
+  return await connection.query('SELECT * FROM users WHERE id=$1', [id]);
+}
+
 export async function insertUserRepository(infos) {
   const { name, email, passwordHashed, imageUrl } = infos;
 
