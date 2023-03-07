@@ -22,7 +22,6 @@ const signupSchema = Joi.object({
     .required(),
   imageUrl: Joi.
     string()
-    .trim()
     .min(0)
 });
 
