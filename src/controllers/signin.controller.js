@@ -9,10 +9,7 @@ async function signin(request, response, next) {
     const { token } = response.locals;
 
     const userResults = await getUserRepository(email);
-    console.log(userResults.rows[0].password)
     const userPassword = userResults.rows[0].password;
-
-    console.log('userPassword: ', userPassword);
 
     const passwordHash = bcrypt.compareSync(password, userPassword);
     if (!passwordHash) {

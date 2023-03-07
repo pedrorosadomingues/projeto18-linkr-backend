@@ -37,8 +37,6 @@ async function signinAuth(request, response, next) {
 
     response.locals.token = token;
 
-    console.log('USERID', userId)
-
     await createSessionRepository(userId, token);
 
     response.cookie('jwt',
