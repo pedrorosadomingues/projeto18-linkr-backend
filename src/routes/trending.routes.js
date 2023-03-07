@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getTrendingHashtags } from '../controllers/hashtags.js';
+import { getTrendingHashtags } from '../controllers/hashtags.controller.js';
 
 const router = Router();
 
