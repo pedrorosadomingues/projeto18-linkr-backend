@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { DAY_TO_MILLISECONDS } from '../utils/Constants.util.js';
 import { INTERNAL_SERVER_ERROR, UNAUTHORIZED } from '../utils/Codes.util.js';
 import dotenv from 'dotenv';
-import { getUserRepository } from '../repositories/users.repository.js';
+import { createSessionRepository, getUserRepository } from '../repositories/users.repository.js';
 
 dotenv.config();
 
@@ -30,10 +30,14 @@ async function signinAuth(request, response, next) {
     const resultsFromUsers = await getUserRepository(email);
 
     if (resultsFromUsers.rows.length === 0) return response.sendStatus(UNAUTHORIZED);
+
+    const userId = resultsFromUsers.rows[0]?.id;
   
-    const token = createToken(0);
+    const token = createToken(userId);
 
     response.locals.token = token;
+
+    createSessionRepository(userId, token);
 
     response.cookie('jwt',
       token,
