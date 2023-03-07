@@ -2,8 +2,7 @@
   "name": "projeto18-linkr-backend",
   "version": "1.0.0",
   "main": "index.js",
-  "type":"module",
-  "devDependencies": {},
+  "type": "module",
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js"
@@ -20,7 +19,6 @@
   },
   "homepage": "https://github.com/pedrorosadomingues/projeto18-linkr-backend#readme",
   "description": "",
-  
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
@@ -29,8 +27,7 @@
     "joi": "^17.8.3",
     "jsonwebtoken": "^9.0.0",
     "nodemon": "^2.0.21",
-    "pg": "^8.10.0"
+    "pg": "^8.10.0",
+    "url-metadata": "^2.5.0"
   }
-  
 }
-
