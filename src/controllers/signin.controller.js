@@ -1,6 +1,6 @@
 import { getUserRepository } from "../repositories/users.repository.js";
 import bcrypt from 'bcrypt';
-import { INTERNAL_SERVER_ERROR, OK } from "../utils/Codes.util.js";
+import { INTERNAL_SERVER_ERROR, OK, UNAUTHORIZED } from "../utils/Codes.util.js";
 
 async function signin(request, response, next) {
   const { password, email } = request.body;
@@ -24,6 +24,4 @@ async function signin(request, response, next) {
   }
 };
 
-export {
-  signin,
-};
+export default signin;
