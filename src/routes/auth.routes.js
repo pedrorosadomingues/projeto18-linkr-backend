@@ -6,10 +6,10 @@ import validateSignup from '../middlewares/signup.middleware.js';
 import signinAuth from '../auth/signin.auth.js';
 import logout from '../controllers/logout.controller.js';
 
-const router = Router();
+const authRoutes = Router();
 
-router.post('/', validateSignin, signinAuth, signin);
-router.post('/sign-up', validateSignup, signup);
-router.delete('/logout', logout);
+authRoutes.post('/', validateSignin, signinAuth, signin);
+authRoutes.post('/sign-up', validateSignup, signup);
+authRoutes.delete('/logout', logout);
 
-export default router;
+export default authRoutes;

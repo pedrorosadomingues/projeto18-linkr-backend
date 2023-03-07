@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { getTrendingHashtags } from '../controllers/hashtags.controller.js';
 
-const router = Router();
+const trendingRoutes = Router();
 
-router.get('/hashtag', getTrendingHashtags);
+trendingRoutes.get('/hashtag', getTrendingHashtags);
 
-export default router;
+export default trendingRoutes;
