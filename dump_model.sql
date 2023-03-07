@@ -22,10 +22,14 @@ CREATE TABLE likes (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE trends (
+CREATE TABLE hashtags (
     id SERIAL PRIMARY KEY,
     name VARCHAR(55) NOT NULL UNIQUE,
     "userId" INTEGER NOT NULL REFERENCES users(id),
     count INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+INSERT INTO users (name, email, password) VALUES ('Pedro', 'pedro@email.com', '123456');
+INSERT INTO hashtags (name, "userId") VALUES ('#linkr', 1);
+SELECT * FROM hashtags order by "timesUsed" desc limit 10;
