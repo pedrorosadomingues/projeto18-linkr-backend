@@ -13,6 +13,7 @@ export async function insertUserRepository(infos) {
 };
 
 export async function createSessionRepository(id, token) {
+  console.log('id:', id, 'token:', token)
   try {
     await connection
       .query(`INSERT INTO sessions ("userId", token) VALUES ($1, $2)`, [id, token]);

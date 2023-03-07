@@ -31,7 +31,7 @@ CREATE TABLE trends (
 );
 
 CREATE TABLE sessions (
-    id integer NOT NULL,
+    id SERIAL NOT NULL,
     token text NOT NULL,
     "userId" integer NOT NULL REFERENCES users(id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
