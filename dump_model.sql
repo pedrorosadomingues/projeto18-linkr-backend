@@ -3,7 +3,7 @@ CREATE TABLE users (
     name VARCHAR(55) NOT NULL,
     email VARCHAR(55) NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    "imageUrl" TEXT,
+    "imageUrl" TEXT NOT NULL DEFAULT 'https://img1.gratispng.com/20180722/ybz/kisspng-user-profile-2018-in-sight-user-conference-expo-5b554c09380f76.0349129615323166812296.jpg',
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -22,7 +22,7 @@ CREATE TABLE likes (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE trends (
+CREATE TABLE hashtags (
     id SERIAL PRIMARY KEY,
     name VARCHAR(55) NOT NULL UNIQUE,
     "userId" INTEGER NOT NULL REFERENCES users(id),
@@ -30,9 +30,9 @@ CREATE TABLE trends (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE sessions (
-    id SERIAL NOT NULL,
-    token text NOT NULL,
-    "userId" integer NOT NULL REFERENCES users(id),
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
-);
+
+INSERT INTO users (name, email, password) VALUES ('Pedro', 'pedro@email.com', '123456');
+INSERT INTO hashtags (name, "userId") VALUES ('#linkr', 1);
+SELECT * FROM hashtags order by "timesUsed" desc limit 10;
+
+
