@@ -30,6 +30,9 @@ CREATE TABLE hashtags (
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+
 INSERT INTO users (name, email, password) VALUES ('Pedro', 'pedro@email.com', '123456');
 INSERT INTO hashtags (name, "userId") VALUES ('#linkr', 1);
 SELECT * FROM hashtags order by "timesUsed" desc limit 10;
+
+
