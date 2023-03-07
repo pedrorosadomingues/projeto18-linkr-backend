@@ -35,7 +35,7 @@ async function signinAuth(request, response, next) {
   
     const token = createToken(userId);
 
-    response.locals.token = token;
+    response.locals= {token, resultsFromUsers};
 
     await createSessionRepository(userId, token);
 

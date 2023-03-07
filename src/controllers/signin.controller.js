@@ -6,7 +6,7 @@ async function signin(request, response, next) {
   const { password, email } = request.body;
 
   try {
-    const { token } = response.locals;
+    const { token, resultsFromUsers } = response.locals;
 
     const userResults = await getUserRepository(email);
     const userPassword = userResults.rows[0].password;
@@ -16,7 +16,7 @@ async function signin(request, response, next) {
       return response.sendStatus(UNAUTHORIZED);
     }
 
-    return response.status(OK).send({ token });
+    return response.status(OK).send({ token, user: resultsFromUsers.rows[0] });
   } catch (error) {
     console.log('Error on server: ', error);
 
