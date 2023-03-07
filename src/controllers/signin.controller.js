@@ -4,7 +4,8 @@ async function signin(request, response, next) {
   const { password, email } = request.body;
 
   try {
-
+    console.log('Token from signin controller: ', response.locals.token)
+    console.log('Password from signin controller: ', password)
     return response.status(OK).send('hello');
   } catch (error) {
     console.log('Error on server: ', error);
