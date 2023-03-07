@@ -2,7 +2,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(55) NOT NULL,
     email VARCHAR(55) NOT NULL UNIQUE,
-    password VARCHAR(55) NOT NULL,
+    password TEXT NOT NULL,
     "imageUrl" TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
