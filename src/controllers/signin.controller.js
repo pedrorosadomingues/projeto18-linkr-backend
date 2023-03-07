@@ -1,12 +1,25 @@
+import { getUserRepository } from "../repositories/users.repository.js";
+import bcrypt from 'bcrypt';
 import { INTERNAL_SERVER_ERROR, OK } from "../utils/Codes.util.js";
 
 async function signin(request, response, next) {
   const { password, email } = request.body;
 
   try {
-    console.log('Token from signin controller: ', response.locals.token)
-    console.log('Password from signin controller: ', password)
-    return response.status(OK).send('hello');
+    const { token } = response.locals;
+
+    const userResults = await getUserRepository(email);
+    console.log(userResults.rows[0].password)
+    const userPassword = userResults.rows[0].password;
+
+    console.log('userPassword: ', userPassword);
+
+    const passwordHash = bcrypt.compareSync(password, userPassword);
+    if (!passwordHash) {
+      return response.sendStatus(UNAUTHORIZED);
+    }
+
+    return response.status(OK).send({ token });
   } catch (error) {
     console.log('Error on server: ', error);
 
