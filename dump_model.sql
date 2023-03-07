@@ -2,8 +2,8 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(55) NOT NULL,
     email VARCHAR(55) NOT NULL UNIQUE,
-    password VARCHAR(55) NOT NULL,
-    "imageUrl" TEXT,
+    password TEXT NOT NULL,
+    "imageUrl" TEXT NOT NULL DEFAULT 'https://img1.gratispng.com/20180722/ybz/kisspng-user-profile-2018-in-sight-user-conference-expo-5b554c09380f76.0349129615323166812296.jpg',
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
