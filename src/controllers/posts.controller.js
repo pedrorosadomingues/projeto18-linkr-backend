@@ -1,4 +1,4 @@
-import { deletePostRepository, getAllPosts, insertPost, updatePostRepository } from "../repositories/posts.repository.js";
+import { deleteLike, deletePostRepository, getAllPosts, insertLike, insertPost, updatePostRepository } from "../repositories/posts.repository.js";
 import { CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT } from "../utils/Codes.util.js";
 
 
@@ -7,14 +7,10 @@ export async function createPost(_, res){
     const {id} = res.locals.user;
     const metadataId = res.locals.metadataId;
 
-    console.log(id)
-
-    await insertPost(url, id, description, metadataId);
-
-    res.sendStatus(201);
-
     try {
-        
+      await insertPost(url, id, description, metadataId);
+
+      res.sendStatus(201);
     } catch (error) {
         console.log("error in createPost")
         console.log(error);
@@ -69,3 +65,36 @@ export async function updatePost(request, response) {
     return response.sendStatus(INTERNAL_SERVER_ERROR);
   }
 };
+
+export async function likePost(_, res){
+  
+  const user = res.locals.user;
+  const post = res.locals.post;
+
+  try {
+    await insertLike(user.id, post.id);
+
+    res.sendStatus(200);
+
+  } catch (error) {
+      console.log(error);
+      res.status(500).send(error.message)
+  }
+}
+
+export async function unlikePost(_, res){
+  
+  const user = res.locals.user;
+  const post = res.locals.post;
+ 
+
+  try {
+    await deleteLike(user.id, post.id);
+
+    res.sendStatus(200);
+
+  } catch (error) {
+      console.log(error);
+      res.status(500).send(error.message)
+  }
+}

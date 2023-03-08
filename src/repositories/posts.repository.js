@@ -18,6 +18,27 @@ export async function insertPost(url, userId, description, metadataId){
       );
 }
 
+export async function insertLike(userId, postId){
+  return await connection.query(
+      `INSERT INTO likes ("userId", "postId") VALUES ($1,$2)`,
+      [userId, postId]
+    );
+}
+
+export async function deleteLike(userId, postId){
+  return await connection.query(
+      `DELETE FROM likes WHERE "userId"=$1 AND "postId"=$2;`,
+      [userId, postId]
+    );
+}
+
+export async function getPostById(postId){
+  return await connection.query(
+      `SELECT * FROM posts WHERE id=$1;`,[postId]
+    );
+}
+
+
 export async function getAllPosts(){
   
     return await connection.query(
@@ -28,7 +49,7 @@ export async function getAllPosts(){
         u.id AS user_id, 
         u.name AS user_name, 
         u."imageUrl" AS user_image_url, 
-        COUNT(l.id) AS like_count, 
+        CAST(COUNT(l.id) AS INTEGER)AS like_count, 
         COALESCE(
           JSON_AGG(
             JSON_BUILD_OBJECT(
