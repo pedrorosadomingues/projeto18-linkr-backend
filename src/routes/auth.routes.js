@@ -5,11 +5,14 @@ import validateSignin from '../middlewares/signin.middleware.js';
 import validateSignup from '../middlewares/signup.middleware.js';
 import signinAuth from '../auth/signin.auth.js';
 import logout from '../controllers/logout.controller.js';
+import { userAuth } from '../middlewares/auth.middleware.js';
+import { getUser } from '../controllers/getUser.controller.js';
 
 const authRoutes = Router();
 
 authRoutes.post('/', validateSignin, signinAuth, signin);
 authRoutes.post('/sign-up', validateSignup, signup);
 authRoutes.delete('/logout', logout);
+authRoutes.get('/get-user', userAuth, getUser);
 
 export default authRoutes;
