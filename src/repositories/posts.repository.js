@@ -6,14 +6,14 @@ export async function getMetadata(url) {
 
 export async function insertMetadata(title, description, url, image) {
     return  await connection.query(
-        `INSERT INTO metadata (title, description, url, image) VALUES ($1,$2,$3,$4);`,
+        `INSERT INTO metadata (title, description, url, image) VALUES ($1,$2,$3,$4) RETURNING id;`,
         [title, description, url, image]
     );
 }
 
 export async function insertPost(url, userId, description, metadataId){
     return await connection.query(
-        `INSERT INTO posts (url, "userId", description, "metadataId") VALUES ($1,$2,$3,$4) RETURNING id;`,
+        `INSERT INTO posts (url, "userId", description, "metadataId") VALUES ($1,$2,$3,$4)`,
         [url, userId, description, metadataId]
       );
 }
@@ -56,7 +56,11 @@ export async function getAllPosts(){
         LEFT JOIN users u2 ON l."userId" = u2.id 
       GROUP BY 
         p.id, 
-        u.id;
+        u.id
+      ORDER BY 
+        p.created_at DESC 
+      LIMIT 
+        20;
         `
     )
 }

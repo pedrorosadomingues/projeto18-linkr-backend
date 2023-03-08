@@ -30,7 +30,7 @@ export async function scrapMetadata(_, res, next){
       
       await urlMetadata(url)
         .then(async (meta) => {
-          console.log(meta.title)
+        
 
           meta.title? "" : meta.title = "Not Found"
           meta.description? "" : meta.description = "Not Found"
@@ -49,10 +49,11 @@ export async function scrapMetadata(_, res, next){
         })
     } else {
       res.locals.metadataId = metadata.rows[0].id;
+      console.log(res.metadataId)
     }
     next();
   } catch (err) {
-    console.log(err.message);
+    console.log("Erro em scrapMetadata")
     res.status(500).send(err.message);
   }
 }
