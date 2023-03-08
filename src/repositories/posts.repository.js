@@ -65,3 +65,13 @@ export async function getAllPosts(){
     )
 }
  
+export async function deletePostRepository(postId, userId) {
+  console.log(Number(postId), userId);
+
+  return await connection.query(
+    `
+    DELETE FROM posts
+    WHERE posts."userId" = $1 AND posts.id = $2
+    `
+  , [userId, Number(postId)]);
+};

@@ -1,4 +1,5 @@
-import { getAllPosts, insertPost } from "../repositories/posts.repository.js";
+import { deletePostRepository, getAllPosts, insertPost } from "../repositories/posts.repository.js";
+import { INTERNAL_SERVER_ERROR, NO_CONTENT } from "../utils/Codes.util.js";
 
 
 export async function createPost(_, res){
@@ -35,3 +36,18 @@ export async function getPosts(_, res){
         res.status(500).send(error.message)
     }
 }
+
+export async function deletePost(request, response) {
+  try {
+    const {id: postId} = request.params;
+    const {id: userId} = response.locals.user;
+
+    await deletePostRepository(postId, userId);
+
+    return response.sendStatus(NO_CONTENT);
+  } catch (error) {
+    console.log(error);
+
+    return response.sendStatus(INTERNAL_SERVER_ERROR);
+  }
+};
