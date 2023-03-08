@@ -4,6 +4,6 @@ import { userAuth } from '../middlewares/auth.middleware.js';
 
 const trendingRoutes = Router();
 
-trendingRoutes.get('/hashtag', userAuth, getTrendingHashtags);
+trendingRoutes.get('/hashtag', getTrendingHashtags);
 
 export default trendingRoutes;
