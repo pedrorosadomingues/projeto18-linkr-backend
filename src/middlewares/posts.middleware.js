@@ -1,6 +1,6 @@
 import postSchema from "../schemas/posts.schema.js";
 import urlMetadata from "url-metadata";
-import { getMetadata, insertMetadata } from "../repositories/posts.repository.js";
+import { getMetadata, getPostById, insertMetadata } from "../repositories/posts.repository.js";
 
 export function validatePost(req, res, next){
     const {url, description} = req.body
@@ -19,6 +19,23 @@ export function validatePost(req, res, next){
         console.log('Error on server: ', error);
         return response.sendStatus(500);
       }
+}
+
+
+export async function findPost(req, res, next){
+  const {postId} = req.body
+
+  try {
+
+      const data = await getPostById(postId);
+     
+      res.locals.post = data.rows[0]
+
+      next();
+    } catch (error) {
+      console.log(error);
+      return res.sendStatus(500);
+    }
 }
 
 export async function scrapMetadata(_, res, next){
@@ -57,3 +74,4 @@ export async function scrapMetadata(_, res, next){
     res.status(500).send(err.message);
   }
 }
+
