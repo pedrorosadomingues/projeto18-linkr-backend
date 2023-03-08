@@ -5,6 +5,7 @@ import { findUserById } from '../repositories/users.repository.js';
 export async function userAuth(req, res, next){
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", '');
+    console.log('AUTH:', authorization)
     if (!token) return res.sendStatus(401);
     const secretKey = process.env.SECRET_KEY;
 

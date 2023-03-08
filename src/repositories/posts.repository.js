@@ -75,3 +75,15 @@ export async function deletePostRepository(postId, userId) {
     `
   , [userId, Number(postId)]);
 };
+
+export async function updatePostRepository(postId, userId, text) {
+  console.log(Number(postId), userId);
+
+  return await connection.query(
+    `
+    UPDATE posts
+    SET description = $3
+    WHERE posts."userId" = $1 AND posts.id = $2
+    `
+  , [userId, Number(postId), text]);
+};

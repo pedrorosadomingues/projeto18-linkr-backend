@@ -10,7 +10,7 @@ function createToken(id) {
   const days = 3;
   const key = process.env.SECRET_KEY;
   try {
-    const token = jwt.sign({ id }, 'key', {
+    const token = jwt.sign({ id }, key, {
       expiresIn: DAY_TO_MILLISECONDS * days / 1000
     });
 
