@@ -18,6 +18,7 @@ try {
 	
 } catch (error) {
 	console.log(error)
-    res.sendStatus(500)
+    console.log("Erro en userAuth")
+    res.status(500).send("Error in authenttication")
 }
 }

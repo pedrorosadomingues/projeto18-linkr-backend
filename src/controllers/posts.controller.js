@@ -6,6 +6,8 @@ export async function createPost(_, res){
     const {id} = res.locals.user;
     const metadataId = res.locals.metadataId;
 
+    console.log(id)
+
     await insertPost(url, id, description, metadataId);
 
     res.sendStatus(201);
@@ -15,13 +17,12 @@ export async function createPost(_, res){
     } catch (error) {
         console.log("error in createPost")
         console.log(error);
-        res.status(500).send(error.message)
+        res.status(500).send("error on create post")
     }
 }
 
 export async function getPosts(_, res){
-    // const {id} = res.locals.user;
-  
+   
 
     const {rows} = await getAllPosts();
 
@@ -31,7 +32,6 @@ export async function getPosts(_, res){
         
     } catch (error) {
         console.log("error in getPosts")
-        console.log(error);
         res.status(500).send(error.message)
     }
 }
