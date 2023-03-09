@@ -15,3 +15,7 @@ export async function insertUserRepository(infos) {
     VALUES ($1, $2, $3, $4)`,
     [name, email, passwordHashed, imageUrl]);
 };
+
+export async function getUsersRepository(name) {
+  return await connection.query(`SELECT * FROM users WHERE name LIKE '%${name}%'`);
+};
