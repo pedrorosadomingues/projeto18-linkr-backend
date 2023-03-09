@@ -1,4 +1,4 @@
-import { getAllHashtags } from "../repositories/hashtags.repository.js";
+import { getAllHashtags, insertHashtags } from "../repositories/hashtags.repository.js";
 
 export async function getTrendingHashtags(req, res) {
   try {
@@ -10,6 +10,18 @@ export async function getTrendingHashtags(req, res) {
 
     res.send(hashtags);
 
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export async function addHashtags(req, res) {
+  try {
+
+    await insertHashtags(req.body);
+
+    res.sendStatus(200);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);

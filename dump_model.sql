@@ -21,10 +21,8 @@ CREATE TABLE posts (
     url TEXT NOT NULL,
     "userId" INTEGER NOT NULL REFERENCES users(id),
     description VARCHAR(255),
-    "metadataId" INTEGER NOT NULL REFERENCES metadata(id)
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    "metadataId" INTEGER NOT NULL REFERENCES metadata(id) created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
-
 
 CREATE TABLE likes (
     id SERIAL PRIMARY KEY,
@@ -36,10 +34,15 @@ CREATE TABLE likes (
 CREATE TABLE hashtags (
     id SERIAL PRIMARY KEY,
     name VARCHAR(55) NOT NULL UNIQUE,
-    "userId" INTEGER NOT NULL REFERENCES users(id),
-    count INTEGER NOT NULL DEFAULT 0,
+    "timesUsed" INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 
-
+INSERT INTO
+    hashtags (name, "timesUsed")
+VALUES
+    ('#minhahastag', 1) ON CONFLICT (name) DO
+UPDATE
+SET
+    "timesUsed" = hashtags."timesUsed" + 1;
