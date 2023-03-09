@@ -21,7 +21,8 @@ CREATE TABLE posts (
     url TEXT NOT NULL,
     "userId" INTEGER NOT NULL REFERENCES users(id),
     description VARCHAR(255),
-    "metadataId" INTEGER NOT NULL REFERENCES metadata(id) created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    "metadataId" INTEGER NOT NULL REFERENCES metadata(id),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE likes (
