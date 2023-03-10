@@ -1,9 +1,9 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(55) NOT NULL,
-    email VARCHAR(55) NOT NULL UNIQUE,
+    name VARCHAR(200) NOT NULL,
+    email VARCHAR(200) NOT NULL UNIQUE,
     password TEXT NOT NULL,
-    "imageUrl" TEXT NOT NULL DEFAULT 'https://img1.gratispng.com/20180722/ybz/kisspng-user-profile-2018-in-sight-user-conference-expo-5b554c09380f76.0349129615323166812296.jpg',
+    "imageUrl" TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -38,12 +38,3 @@ CREATE TABLE hashtags (
     "timesUsed" INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
-
-
-INSERT INTO
-    hashtags (name, "timesUsed")
-VALUES
-    ('#minhahastag', 1) ON CONFLICT (name) DO
-UPDATE
-SET
-    "timesUsed" = hashtags."timesUsed" + 1;
