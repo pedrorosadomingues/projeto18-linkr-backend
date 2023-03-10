@@ -1,4 +1,4 @@
-import { getAllHashtags, insertHashtags } from "../repositories/hashtags.repository.js";
+import { getAllHashtags, insertHashtags, filterPostsByHashtag } from "../repositories/hashtags.repository.js";
 
 export async function getTrendingHashtags(req, res) {
   try {

@@ -11,7 +11,7 @@ export async function insertHashtags(hashtag) {
 
 }
 
-xport async function filterPostsByHashtag(hashtag) {
+export async function filterPostsByHashtag(hashtag) {
   const result = await db.query(
     `SELECT 
   p.id AS post_id, 
