@@ -1,42 +1,42 @@
-import { deleteLike, deletePostRepository, getAllPosts, insertLike, insertPost, updatePostRepository } from "../repositories/posts.repository.js";
+import { deleteLike, deletePostRepository, getAllPosts, getFollowingPosts, insertLike, insertPost, updatePostRepository } from "../repositories/posts.repository.js";
 import { CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT } from "../utils/Codes.util.js";
 
 
-export async function createPost(_, res){
-    const {url, description} = res.locals.postData;
-    const {id} = res.locals.user;
-    const metadataId = res.locals.metadataId;
+export async function createPost(_, res) {
+  const { url, description } = res.locals.postData;
+  const { id } = res.locals.user;
+  const metadataId = res.locals.metadataId;
 
-    try {
-      await insertPost(url, id, description, metadataId);
+  try {
+    await insertPost(url, id, description, metadataId);
 
-      res.sendStatus(201);
-    } catch (error) {
-        console.log("error in createPost")
-        console.log(error);
-        res.status(500).send("error on create post")
-    }
+    res.sendStatus(201);
+  } catch (error) {
+    console.log("error in createPost")
+    console.log(error);
+    res.status(500).send("error on create post")
+  }
 }
 
-export async function getPosts(_, res){
-   
+export async function getPosts(_, res) {
+  const { id } = res.locals.user;
 
-    const {rows} = await getAllPosts();
+  const { rows } = await getAllPosts(id);
 
-    res.status(200).send(rows);
+  res.status(200).send(rows);
 
-    try {
-        
-    } catch (error) {
-        console.log("error in getPosts")
-        res.status(500).send(error.message)
-    }
+  try {
+
+  } catch (error) {
+    console.log("error in getPosts")
+    res.status(500).send(error.message)
+  }
 }
 
 export async function deletePost(request, response) {
   try {
-    const {id: postId} = request.params;
-    const {id: userId} = response.locals.user;
+    const { id: postId } = request.params;
+    const { id: userId } = response.locals.user;
 
     await deletePostRepository(postId, userId);
 
@@ -50,9 +50,9 @@ export async function deletePost(request, response) {
 
 export async function updatePost(request, response) {
   try {
-    const {text} = request.body;
-    const {id: postId} = request.params;
-    const {id: userId} = response.locals.user;
+    const { text } = request.body;
+    const { id: postId } = request.params;
+    const { id: userId } = response.locals.user;
 
     console.log(text)
 
@@ -66,8 +66,8 @@ export async function updatePost(request, response) {
   }
 };
 
-export async function likePost(_, res){
-  
+export async function likePost(_, res) {
+
   const user = res.locals.user;
   const post = res.locals.post;
 
@@ -77,16 +77,16 @@ export async function likePost(_, res){
     res.sendStatus(200);
 
   } catch (error) {
-      console.log(error);
-      res.status(500).send(error.message)
+    console.log(error);
+    res.status(500).send(error.message)
   }
 }
 
-export async function unlikePost(_, res){
-  
+export async function unlikePost(_, res) {
+
   const user = res.locals.user;
   const post = res.locals.post;
- 
+
 
   try {
     await deleteLike(user.id, post.id);
@@ -94,7 +94,7 @@ export async function unlikePost(_, res){
     res.sendStatus(200);
 
   } catch (error) {
-      console.log(error);
-      res.status(500).send(error.message)
+    console.log(error);
+    res.status(500).send(error.message)
   }
 }

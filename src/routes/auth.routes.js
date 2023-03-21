@@ -14,7 +14,7 @@ authRoutes.post('/', validateSignin, signinAuth, signin);
 authRoutes.post('/sign-up', validateSignup, signup);
 authRoutes.delete('/logout', logout);
 authRoutes.get('/get-user', userAuth, getUser);
-authRoutes.post('/get-users', getUsers);
+authRoutes.post('/get-users', userAuth, getUsers);
 authRoutes.post('/get-user-by-id', getUserById);
 
 export default authRoutes;

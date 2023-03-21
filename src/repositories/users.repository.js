@@ -19,3 +19,17 @@ export async function insertUserRepository(infos) {
 export async function getUsersRepository(name) {
   return await connection.query(`SELECT * FROM users WHERE name LIKE '%${name}%'`);
 };
+
+export async function getUsersRepository2(name, myId) {
+  return await connection.query(`SELECT u.id, u.name, u."imageUrl", COALESCE(f.followed_by_current_user, false) AS is_followed
+  FROM users u
+  LEFT JOIN (
+    SELECT followed, true AS followed_by_current_user
+    FROM followers
+    WHERE following = ${myId}
+  ) f ON u.id = f.followed
+  WHERE u.name ILIKE '%${name}%'
+  ORDER BY is_followed DESC, u.name ASC;`);
+};
+
+

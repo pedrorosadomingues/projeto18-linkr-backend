@@ -1,4 +1,4 @@
-import { findUserById, getUsersRepository } from "../repositories/users.repository.js";
+import { findUserById, getUsersRepository, getUsersRepository2 } from "../repositories/users.repository.js";
 import { INTERNAL_SERVER_ERROR, OK } from "../utils/Codes.util.js";
 
 
@@ -13,11 +13,13 @@ try {
 
 export async function getUsers(request, response) {
   const {name} = request.body;
-  console.log(request.body)
+
+  const myUser = response.locals.user;
+  // console.log(request.body)
 
   try {
-    const data = await getUsersRepository(name);
-    console.log('USERS:', data.rows);
+    const data = await getUsersRepository2(name, myUser.id);
+    // console.log('USERS:', data.rows);
 
     return response.status(OK).send(data.rows);
   } catch (error) {
@@ -29,11 +31,11 @@ export async function getUsers(request, response) {
 
 export async function getUserById(request, response) {
   const {id} = request.body;
-  console.log(request.body)
+  // console.log(request.body)
 
   try {
     const data = await findUserById(id);
-    console.log('USER:', data.rows);
+    // console.log('USER:', data.rows);
 
     return response.status(OK).send(data.rows);
   } catch (error) {

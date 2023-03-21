@@ -47,6 +47,7 @@ export async function scrapMetadata(_, res, next){
       
       await urlMetadata(url)
         .then(async (meta) => {
+
         
 
           meta.title? "" : meta.title = "Not Found"
