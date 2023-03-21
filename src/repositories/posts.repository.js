@@ -38,8 +38,18 @@ export async function getPostById(postId){
     );
 }
 
+export async function getFollowingPosts(id){
+  return await connection.query(
+      `SELECT p.*
+      FROM posts p
+      JOIN followers f ON p.user_id = f.followed
+      WHERE f.following = ${id}
+      ORDER BY p.posted_at DESC;
+      `
+    );
+}
 
-export async function getAllPosts(){
+export async function getAllPosts(id){
   
     return await connection.query(
         `
@@ -72,9 +82,11 @@ export async function getAllPosts(){
         ) AS metadata_info
       FROM 
         posts p 
-        JOIN users u ON p."userId" = u.id 
+        JOIN users u ON p."userId" = u.id
+        JOIN followers f ON p."userId" = f.followed
         LEFT JOIN likes l ON l."postId" = p.id 
-        LEFT JOIN users u2 ON l."userId" = u2.id 
+        LEFT JOIN users u2 ON l."userId" = u2.id
+        WHERE f.following = ${id}
       GROUP BY 
         p.id, 
         u.id
