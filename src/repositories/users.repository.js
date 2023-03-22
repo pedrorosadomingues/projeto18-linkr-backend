@@ -4,9 +4,22 @@ export async function getUserRepository(email) {
   return await connection.query('SELECT * FROM users WHERE email=$1', [email]);
 };
 
-export async function findUserById(id) {
+/*export async function findUserById(id) {
   return await connection.query('SELECT * FROM users WHERE id=$1', [id]);
+} */
+
+export async function findUserById(id) {
+  return await connection.query(
+    `
+    SELECT u.*, 
+    array_agg(f.followed) AS following_ids 
+    FROM users u 
+    LEFT JOIN followers f ON f.following = u.id
+    WHERE u.id = $1 
+    GROUP BY u.id;
+    `, [id]);
 }
+
 
 export async function insertUserRepository(infos) {
   const { name, email, passwordHashed, imageUrl } = infos;
