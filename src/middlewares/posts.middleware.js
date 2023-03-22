@@ -1,6 +1,7 @@
 import postSchema from "../schemas/posts.schema.js";
 import urlMetadata from "url-metadata";
 import { getMetadata, getPostById, insertMetadata } from "../repositories/posts.repository.js";
+import commentSchema from "../schemas/comment.schema.js";
 
 export function validatePost(req, res, next){
     const {url, description} = req.body
@@ -19,6 +20,26 @@ export function validatePost(req, res, next){
         console.log('Error on server: ', error);
         return response.sendStatus(500);
       }
+}
+
+export async function validateComment(req, res, next){
+  const {comment} = req.body
+  const {id} = req.params
+  try {
+      const validation = commentSchema.validate({comment});
+      if (validation.error) return res.sendStatus(422);
+      res.locals.comment = {comment}
+
+      const post = await getPostById(id);
+      if (post.rowCount === 0) return res.sendStatus(404);
+     
+      res.locals.post = post.rows[0]
+
+      next();
+    } catch (error) {
+      console.log('Error on server: ', error);
+      return response.sendStatus(500);
+    }
 }
 
 
