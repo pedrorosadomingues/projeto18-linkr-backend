@@ -40,25 +40,25 @@ export async function getPostById(postId) {
 
 export async function getPostsFromUserRepository(id) {
   return await connection.query(
-      `SELECT
-        p.id AS post_id, 
-        p.description AS post_description, 
-        u.id AS user_id, 
-        u.name AS user_name, 
-        u."imageUrl" AS user_image_url, 
-        CAST(COUNT(l.id) AS INTEGER)AS like_count, 
-        COALESCE(
+      `
+      SELECT p.id AS post_id, p.description AS post_description, u.id AS user_id, u.name AS user_name, u."imageUrl" AS user_image_url,
+      COALESCE(
+        (SELECT
           JSON_AGG(
             JSON_BUILD_OBJECT(
               'user_id', l."userId", 
               'user_name', u2.name
             )
-          ) FILTER (WHERE l.id IS NOT NULL),
-          '[]'
-        ) AS liked_by_users,
-
-        CAST(COUNT(c.id) AS INTEGER)AS comments_count, 
-        COALESCE(
+          )
+          FROM likes l
+          JOIN users u2 ON l."userId" = u2.id
+          WHERE l."postId" = p.id
+        ),
+        '[]'
+      ) AS liked_by_users,
+  
+      COALESCE(
+        (SELECT
           JSON_AGG(
             JSON_BUILD_OBJECT(
               'commenter_id', c."userId", 
@@ -66,36 +66,36 @@ export async function getPostsFromUserRepository(id) {
               'commenter_image', u3."imageUrl",
               'comment', c."commentText"
             )
-          ) FILTER (WHERE c.id IS NOT NULL),
-          '[]'
-        ) AS commented_by_users,
-
-        (SELECT 
-          JSON_BUILD_OBJECT(
-            'id', m.id,
-            'title', m.title,
-            'description', m.description,
-            'url', m.url,
-            'image', m.image
           )
-          FROM metadata m
-          WHERE m.id = p."metadataId"
-        ) AS metadata_info
-      FROM 
-        posts p 
-        JOIN users u ON p."userId" = u.id
-        LEFT JOIN likes l ON l."postId" = p.id
-        LEFT JOIN comments c ON c."postId" = p.id  
-        LEFT JOIN users u2 ON l."userId" = u2.id
-        LEFT JOIN users u3 ON c."userId" = u3.id
-        WHERE u.id = ${id}
-      GROUP BY 
-        p.id, 
-        u.id
-      ORDER BY 
-        p.created_at DESC 
-      LIMIT 
-        20;
+          FROM comments c
+          JOIN users u3 ON c."userId" = u3.id
+          WHERE c."postId" = p.id
+        ),
+        '[]'
+      ) AS commented_by_users,
+  
+      (SELECT 
+        JSON_BUILD_OBJECT(
+          'id', m.id,
+          'title', m.title,
+          'description', m.description,
+          'url', m.url,
+          'image', m.image
+        )
+        FROM metadata m
+        WHERE m.id = p."metadataId"
+      ) AS metadata_info
+  
+    FROM 
+      posts p 
+      JOIN users u ON p."userId" = u.id
+  
+    WHERE u.id = ${id}
+  
+    ORDER BY 
+      p.created_at DESC 
+  
+    LIMIT 20;
         `
   );
 }
@@ -104,66 +104,64 @@ export async function getAllPosts(id) {
 
   return await connection.query(
     `
-        SELECT 
-        p.id AS post_id, 
-        p.description AS post_description, 
-        u.id AS user_id, 
-        u.name AS user_name, 
-        u."imageUrl" AS user_image_url, 
-        CAST(COUNT(l.id) AS INTEGER)AS like_count, 
-        COALESCE(
-          JSON_AGG(
-            JSON_BUILD_OBJECT(
-              'user_id', l."userId", 
-              'user_name', u2.name
-            )
-          ) FILTER (WHERE l.id IS NOT NULL),
-          '[]'
-        ) AS liked_by_users,
-
-        CAST(COUNT(c.id) AS INTEGER)AS comments_count, 
-        COALESCE(
-          JSON_AGG(
-            JSON_BUILD_OBJECT(
-              'commenter_id', c."userId", 
-              'commenter_name', u3.name,
-              'commenter_image', u3."imageUrl",
-              'comment', c."commentText"
-            )
-          ) FILTER (WHERE c.id IS NOT NULL),
-          '[]'
-        ) AS commented_by_users,
-
-        (SELECT 
+    SELECT p.id AS post_id, p.description AS post_description, u.id AS user_id, u.name AS user_name, u."imageUrl" AS user_image_url,
+    COALESCE(
+      (SELECT
+        JSON_AGG(
           JSON_BUILD_OBJECT(
-            'id', m.id,
-            'title', m.title,
-            'description', m.description,
-            'url', m.url,
-            'image', m.image
+            'user_id', l."userId", 
+            'user_name', u2.name
           )
-          FROM metadata m
-          WHERE m.id = p."metadataId"
-        ) AS metadata_info
-      FROM 
-        posts p 
-        JOIN users u ON p."userId" = u.id
-        JOIN followers f ON p."userId" = f.followed
-        LEFT JOIN likes l ON l."postId" = p.id
-        LEFT JOIN comments c ON c."postId" = p.id  
-        LEFT JOIN users u2 ON l."userId" = u2.id
-        LEFT JOIN users u3 ON c."userId" = u3.id
-        WHERE f.following = ${id}
-      GROUP BY 
-        p.id, 
-        u.id
-      ORDER BY 
-        p.created_at DESC 
-      LIMIT 
-        20;
-        `
+        )
+        FROM likes l
+        JOIN users u2 ON l."userId" = u2.id
+        WHERE l."postId" = p.id
+      ),
+      '[]'
+    ) AS liked_by_users,
+
+    COALESCE(
+      (SELECT
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'commenter_id', c."userId", 
+            'commenter_name', u3.name,
+            'commenter_image', u3."imageUrl",
+            'comment', c."commentText"
+          )
+        )
+        FROM comments c
+        JOIN users u3 ON c."userId" = u3.id
+        WHERE c."postId" = p.id
+      ),
+      '[]'
+    ) AS commented_by_users,
+
+    (SELECT 
+      JSON_BUILD_OBJECT(
+        'id', m.id,
+        'title', m.title,
+        'description', m.description,
+        'url', m.url,
+        'image', m.image
+      )
+      FROM metadata m
+      WHERE m.id = p."metadataId"
+    ) AS metadata_info
+
+  FROM 
+    posts p 
+    JOIN users u ON p."userId" = u.id
+    JOIN followers f ON p."userId" = f.followed
+  WHERE f.following = ${id}
+
+  ORDER BY 
+    p.created_at DESC 
+
+  LIMIT 20;
+    `
     )
-} 
+}
 
 export async function commentPostRepository(postId, userId, comment){
   return await connection.query(
