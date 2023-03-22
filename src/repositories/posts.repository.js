@@ -56,6 +56,20 @@ export async function getPostsFromUserRepository(id) {
           ) FILTER (WHERE l.id IS NOT NULL),
           '[]'
         ) AS liked_by_users,
+
+        CAST(COUNT(c.id) AS INTEGER)AS comments_count, 
+        COALESCE(
+          JSON_AGG(
+            JSON_BUILD_OBJECT(
+              'commenter_id', c."userId", 
+              'commenter_name', u.name,
+              'commenter_image', u."imageUrl",
+              'comment', c."commentText"
+            )
+          ) FILTER (WHERE c.id IS NOT NULL),
+          '[]'
+        ) AS commented_by_users,
+
         (SELECT 
           JSON_BUILD_OBJECT(
             'id', m.id,
@@ -70,8 +84,8 @@ export async function getPostsFromUserRepository(id) {
       FROM 
         posts p 
         JOIN users u ON p."userId" = u.id
-        JOIN followers f ON p."userId" = f.followed
-        LEFT JOIN likes l ON l."postId" = p.id 
+        LEFT JOIN likes l ON l."postId" = p.id
+        LEFT JOIN comments c ON c."postId" = p.id  
         LEFT JOIN users u2 ON l."userId" = u2.id
         WHERE u.id = ${id}
       GROUP BY 
@@ -105,6 +119,20 @@ export async function getAllPosts(id) {
           ) FILTER (WHERE l.id IS NOT NULL),
           '[]'
         ) AS liked_by_users,
+
+        CAST(COUNT(c.id) AS INTEGER)AS comments_count, 
+        COALESCE(
+          JSON_AGG(
+            JSON_BUILD_OBJECT(
+              'commenter_id', c."userId", 
+              'commenter_name', u.name,
+              'commenter_image', u."imageUrl",
+              'comment', c."commentText"
+            )
+          ) FILTER (WHERE c.id IS NOT NULL),
+          '[]'
+        ) AS commented_by_users,
+
         (SELECT 
           JSON_BUILD_OBJECT(
             'id', m.id,
@@ -120,7 +148,8 @@ export async function getAllPosts(id) {
         posts p 
         JOIN users u ON p."userId" = u.id
         JOIN followers f ON p."userId" = f.followed
-        LEFT JOIN likes l ON l."postId" = p.id 
+        LEFT JOIN likes l ON l."postId" = p.id
+        LEFT JOIN comments c ON c."postId" = p.id  
         LEFT JOIN users u2 ON l."userId" = u2.id
         WHERE f.following = ${id}
       GROUP BY 
