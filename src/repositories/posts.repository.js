@@ -18,6 +18,13 @@ export async function insertPost(url, userId, description, metadataId) {
   );
 }
 
+export async function insertShare(userId, postId) {
+  return await connection.query(
+    `INSERT INTO shares ("userId", "postId") VALUES ($1,$2)`,
+    [userId, postId]
+  );
+}
+
 export async function insertLike(userId, postId) {
   return await connection.query(
     `INSERT INTO likes ("userId", "postId") VALUES ($1,$2)`,
