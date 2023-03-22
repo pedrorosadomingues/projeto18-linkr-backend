@@ -1,4 +1,4 @@
-import { deleteLike, deletePostRepository, getAllPosts, getFollowingPosts, insertLike, insertPost, updatePostRepository } from "../repositories/posts.repository.js";
+import { deleteLike, deletePostRepository, getAllPosts, getPostsFromUserRepository, insertLike, insertPost, updatePostRepository } from "../repositories/posts.repository.js";
 import { CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT } from "../utils/Codes.util.js";
 
 
@@ -29,6 +29,21 @@ export async function getPosts(_, res) {
 
   } catch (error) {
     console.log("error in getPosts")
+    res.status(500).send(error.message)
+  }
+}
+
+export async function getPostsFromUser(req, res) {
+  const { id } = req.params;
+
+  const { rows } = await getPostsFromUserRepository(id);
+
+  res.status(200).send(rows);
+
+  try {
+
+  } catch (error) {
+    console.log("error in getPostsFromUser")
     res.status(500).send(error.message)
   }
 }

@@ -1,58 +1,94 @@
 import connection from "../database/database.connection.js";
 
 export async function getMetadata(url) {
-    return await connection.query(`SELECT * FROM metadata WHERE url=$1`, [url]);
-  }
+  return await connection.query(`SELECT * FROM metadata WHERE url=$1`, [url]);
+}
 
 export async function insertMetadata(title, description, url, image) {
-    return  await connection.query(
-        `INSERT INTO metadata (title, description, url, image) VALUES ($1,$2,$3,$4) RETURNING id;`,
-        [title, description, url, image]
-    );
-}
-
-export async function insertPost(url, userId, description, metadataId){
-    return await connection.query(
-        `INSERT INTO posts (url, "userId", description, "metadataId") VALUES ($1,$2,$3,$4)`,
-        [url, userId, description, metadataId]
-      );
-}
-
-export async function insertLike(userId, postId){
   return await connection.query(
-      `INSERT INTO likes ("userId", "postId") VALUES ($1,$2)`,
-      [userId, postId]
-    );
+    `INSERT INTO metadata (title, description, url, image) VALUES ($1,$2,$3,$4) RETURNING id;`,
+    [title, description, url, image]
+  );
 }
 
-export async function deleteLike(userId, postId){
+export async function insertPost(url, userId, description, metadataId) {
   return await connection.query(
-      `DELETE FROM likes WHERE "userId"=$1 AND "postId"=$2;`,
-      [userId, postId]
-    );
+    `INSERT INTO posts (url, "userId", description, "metadataId") VALUES ($1,$2,$3,$4)`,
+    [url, userId, description, metadataId]
+  );
 }
 
-export async function getPostById(postId){
+export async function insertLike(userId, postId) {
   return await connection.query(
-      `SELECT * FROM posts WHERE id=$1;`,[postId]
-    );
+    `INSERT INTO likes ("userId", "postId") VALUES ($1,$2)`,
+    [userId, postId]
+  );
 }
 
-export async function getFollowingPosts(id){
+export async function deleteLike(userId, postId) {
   return await connection.query(
-      `SELECT p.*
-      FROM posts p
-      JOIN followers f ON p.user_id = f.followed
-      WHERE f.following = ${id}
-      ORDER BY p.posted_at DESC;
-      `
-    );
+    `DELETE FROM likes WHERE "userId"=$1 AND "postId"=$2;`,
+    [userId, postId]
+  );
 }
 
-export async function getAllPosts(id){
-  
-    return await connection.query(
+export async function getPostById(postId) {
+  return await connection.query(
+    `SELECT * FROM posts WHERE id=$1;`, [postId]
+  );
+}
+
+export async function getPostsFromUserRepository(id) {
+  return await connection.query(
+      `SELECT
+        p.id AS post_id, 
+        p.description AS post_description, 
+        u.id AS user_id, 
+        u.name AS user_name, 
+        u."imageUrl" AS user_image_url, 
+        CAST(COUNT(l.id) AS INTEGER)AS like_count, 
+        COALESCE(
+          JSON_AGG(
+            JSON_BUILD_OBJECT(
+              'user_id', l."userId", 
+              'user_name', u2.name
+            )
+          ) FILTER (WHERE l.id IS NOT NULL),
+          '[]'
+        ) AS liked_by_users,
+        (SELECT 
+          JSON_BUILD_OBJECT(
+            'id', m.id,
+            'title', m.title,
+            'description', m.description,
+            'url', m.url,
+            'image', m.image
+          )
+          FROM metadata m
+          WHERE m.id = p."metadataId"
+        ) AS metadata_info
+      FROM 
+        posts p 
+        JOIN users u ON p."userId" = u.id
+        JOIN followers f ON p."userId" = f.followed
+        LEFT JOIN likes l ON l."postId" = p.id 
+        LEFT JOIN users u2 ON l."userId" = u2.id
+        WHERE u.id = ${id}
+      GROUP BY 
+        p.id, 
+        u.id
+      ORDER BY 
+        p.created_at DESC 
+      LIMIT 
+        20;
         `
+  );
+}
+
+export async function getAllPosts(id) {
+
+  return await connection.query(
+    `
         SELECT 
         p.id AS post_id, 
         p.description AS post_description, 
@@ -95,9 +131,9 @@ export async function getAllPosts(id){
       LIMIT 
         20;
         `
-    )
+  )
 }
- 
+
 export async function deletePostRepository(postId, userId) {
   console.log(Number(postId), userId);
 
@@ -106,7 +142,7 @@ export async function deletePostRepository(postId, userId) {
     DELETE FROM posts
     WHERE posts."userId" = $1 AND posts.id = $2
     `
-  , [userId, Number(postId)]);
+    , [userId, Number(postId)]);
 };
 
 export async function updatePostRepository(postId, userId, text) {
@@ -118,5 +154,5 @@ export async function updatePostRepository(postId, userId, text) {
     SET description = $3
     WHERE posts."userId" = $1 AND posts.id = $2
     `
-  , [userId, Number(postId), text]);
+    , [userId, Number(postId), text]);
 };
