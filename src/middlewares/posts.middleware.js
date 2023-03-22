@@ -24,14 +24,13 @@ export function validatePost(req, res, next){
 
 export async function validateComment(req, res, next){
   const {comment} = req.body
-  const {postId} = req.params
-  console.log(comment)
+  const {id} = req.params
   try {
       const validation = commentSchema.validate({comment});
       if (validation.error) return res.sendStatus(422);
       res.locals.comment = {comment}
 
-      const post = await getPostById(postId);
+      const post = await getPostById(id);
       if (post.rowCount === 0) return res.sendStatus(404);
      
       res.locals.post = post.rows[0]
