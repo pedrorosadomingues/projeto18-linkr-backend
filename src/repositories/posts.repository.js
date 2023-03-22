@@ -96,6 +96,13 @@ export async function getAllPosts(id){
         20;
         `
     )
+} 
+
+export async function commentPostRepository(postId, userId, comment){
+  return await connection.query(
+    `INSERT INTO comments ("postId", "userId", "commentText") VALUES ($1,$2,$3)`,
+    [postId, userId, comment]
+  );
 }
  
 export async function deletePostRepository(postId, userId) {

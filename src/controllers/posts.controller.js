@@ -1,4 +1,4 @@
-import { deleteLike, deletePostRepository, getAllPosts, getFollowingPosts, insertLike, insertPost, updatePostRepository } from "../repositories/posts.repository.js";
+import { commentPostRepository, deleteLike, deletePostRepository, getAllPosts, getFollowingPosts, insertLike, insertPost, updatePostRepository } from "../repositories/posts.repository.js";
 import { CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT } from "../utils/Codes.util.js";
 
 
@@ -92,6 +92,23 @@ export async function unlikePost(_, res) {
     await deleteLike(user.id, post.id);
 
     res.sendStatus(200);
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error.message)
+  }
+}
+
+export async function commentPost(_, res) {
+
+  const user = res.locals.user;
+  const post = res.locals.post;
+  const {comment} = res.locals.comment;
+
+  try {
+    await commentPostRepository(post.id, user.id, comment);
+
+    res.sendStatus(201);
 
   } catch (error) {
     console.log(error);
