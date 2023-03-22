@@ -62,8 +62,8 @@ export async function getPostsFromUserRepository(id) {
           JSON_AGG(
             JSON_BUILD_OBJECT(
               'commenter_id', c."userId", 
-              'commenter_name', u.name,
-              'commenter_image', u."imageUrl",
+              'commenter_name', u3.name,
+              'commenter_image', u3."imageUrl",
               'comment', c."commentText"
             )
           ) FILTER (WHERE c.id IS NOT NULL),
@@ -87,6 +87,7 @@ export async function getPostsFromUserRepository(id) {
         LEFT JOIN likes l ON l."postId" = p.id
         LEFT JOIN comments c ON c."postId" = p.id  
         LEFT JOIN users u2 ON l."userId" = u2.id
+        LEFT JOIN users u3 ON c."userId" = u3.id
         WHERE u.id = ${id}
       GROUP BY 
         p.id, 
@@ -125,8 +126,8 @@ export async function getAllPosts(id) {
           JSON_AGG(
             JSON_BUILD_OBJECT(
               'commenter_id', c."userId", 
-              'commenter_name', u.name,
-              'commenter_image', u."imageUrl",
+              'commenter_name', u3.name,
+              'commenter_image', u3."imageUrl",
               'comment', c."commentText"
             )
           ) FILTER (WHERE c.id IS NOT NULL),
@@ -151,6 +152,7 @@ export async function getAllPosts(id) {
         LEFT JOIN likes l ON l."postId" = p.id
         LEFT JOIN comments c ON c."postId" = p.id  
         LEFT JOIN users u2 ON l."userId" = u2.id
+        LEFT JOIN users u3 ON c."userId" = u3.id
         WHERE f.following = ${id}
       GROUP BY 
         p.id, 
