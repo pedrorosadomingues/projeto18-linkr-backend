@@ -183,7 +183,7 @@ export async function getPostsFromUserRepository(id) {
   FROM 
     posts p 
     JOIN users u ON p."userId" = u.id
-    JOIN followers f ON p."userId" = f.followed
+    
     LEFT JOIN shares s ON s."postId" = p.id
   WHERE u.id = ${id}
 
