@@ -1,4 +1,4 @@
-import { commentPostRepository, deleteLike, deletePostRepository, getAllPosts, getPostsFromUserRepository, insertLike, insertPost, updatePostRepository } from "../repositories/posts.repository.js";
+import { commentPostRepository, deleteLike, deletePostRepository, getAllPosts, getAllShares, getPostsFromUserRepository, insertLike, insertPost, insertShare, updatePostRepository } from "../repositories/posts.repository.js";
 import { CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT } from "../utils/Codes.util.js";
 
 
@@ -21,9 +21,14 @@ export async function createPost(_, res) {
 export async function getPosts(_, res) {
   const { id } = res.locals.user;
 
-  const { rows } = await getAllPosts(id);
+  const { rows: postRows } = await getAllPosts(id);
+  const { rows: sharesRows } = await getAllShares(id);
 
-  res.status(200).send(rows);
+  // console.log('postrows', postRows)
+
+  const feed = [...postRows, ...sharesRows].sort((a, b) => b.created_at - a.created_at);
+
+  res.status(200).send(feed);
 
   try {
 
@@ -110,6 +115,40 @@ export async function unlikePost(_, res) {
 
   } catch (error) {
     console.log(error);
+    res.status(500).send(error.message)
+  }
+}
+
+export async function sharePost(_, res) {
+
+  const user = res.locals.user;
+  const post = res.locals.post;
+  console.log('USER NAME', user.name)
+  console.log('USER ID', user.id)
+  console.log('****************************************')
+
+  try {
+    await insertShare(user.id, user.name, post.id);
+
+    res.sendStatus(200);
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error.message)
+  }
+}
+
+export async function getShares(_, res) {
+  const { id } = res.locals.user;
+
+  const { rows } = await getAllShares(id);
+
+  res.status(200).send(rows);
+
+  try {
+
+  } catch (error) {
+    console.log("error in getPosts")
     res.status(500).send(error.message)
   }
 }

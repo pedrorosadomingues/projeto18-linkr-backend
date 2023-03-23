@@ -53,3 +53,11 @@ CREATE TABLE followers (
     following INTEGER NOT NULL REFERENCES users(id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+CREATE TABLE shares (
+    id SERIAL PRIMARY KEY,
+    "userId" INTEGER NOT NULL REFERENCES users(id),
+    "postId" INTEGER NOT NULL REFERENCES posts(id),
+	"userName" TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
