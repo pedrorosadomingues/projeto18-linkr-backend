@@ -24,7 +24,7 @@ export async function getPosts(_, res) {
   const { rows: postRows } = await getAllPosts(id);
   const { rows: sharesRows } = await getAllShares(id);
 
-  // console.log('postrows', postRows)
+  console.log('sharesRows', sharesRows)
 
   const feed = [...postRows, ...sharesRows].sort((a, b) => b.created_at - a.created_at);
 
