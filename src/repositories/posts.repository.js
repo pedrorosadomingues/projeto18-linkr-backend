@@ -52,7 +52,7 @@ export async function getAllShares(id) {
       '[]'
     ) AS liked_by_users,
 
-    CAST(COUNT(s.id) AS INTEGER)AS shares_count,
+     (SELECT COUNT(*) FROM shares s2 WHERE s2."postId" = s."postId") AS shares_count,
 
     COALESCE(
       (SELECT
@@ -89,22 +89,13 @@ export async function getAllShares(id) {
     JOIN shares s ON s."postId" = p.id
   WHERE
         p."userId" = ${id} OR
-        p."userId" IN (
-          SELECT f2.followed
-          FROM followers f2
-          WHERE f2.following = ${id}
-        ) OR
-        p."userId" IN (
-          SELECT f2.following
-          FROM followers f2
-          WHERE f2.followed = ${id}
-        ) OR
         s."userName" IN (
           SELECT u.name
           FROM users u
           JOIN followers f2 ON u.id = f2.followed
           WHERE f2.following = ${id}
-        )
+        ) OR
+        s."userId" = ${id}
 
   GROUP BY
     p.id,
@@ -142,70 +133,71 @@ export async function getPostById(postId) {
 export async function getPostsFromUserRepository(id) {
   return await connection.query(
     `
-      SELECT p.id AS post_id, p.description AS post_description, u.id AS user_id, u.name AS user_name, u."imageUrl" AS user_image_url,
-      COALESCE(
-        (SELECT
-          JSON_AGG(
-            JSON_BUILD_OBJECT(
-              'user_id', l."userId", 
-              'user_name', u2.name
-            )
+    SELECT DISTINCT ON(p.id) p.id AS post_id, p.description AS post_description, u.id AS user_id, u.name AS user_name, u."imageUrl" AS user_image_url, p.created_at,
+    COALESCE(
+      (SELECT
+        JSONB_AGG(
+          JSON_BUILD_OBJECT(
+            'user_id', l."userId", 
+            'user_name', u2.name
           )
-          FROM likes l
-          JOIN users u2 ON l."userId" = u2.id
-          WHERE l."postId" = p.id
-        ),
-        '[]'
-      ) AS liked_by_users,
-
-      CAST(COUNT(s.id) AS INTEGER)AS shares_count,
-  
-      COALESCE(
-        (SELECT
-          JSON_AGG(
-            JSON_BUILD_OBJECT(
-              'commenter_id', c."userId", 
-              'commenter_name', u3.name,
-              'commenter_image', u3."imageUrl",
-              'comment', c."commentText"
-            )
-          )
-          FROM comments c
-          JOIN users u3 ON c."userId" = u3.id
-          WHERE c."postId" = p.id
-        ),
-        '[]'
-      ) AS commented_by_users,
-  
-      (SELECT 
-        JSON_BUILD_OBJECT(
-          'id', m.id,
-          'title', m.title,
-          'description', m.description,
-          'url', m.url,
-          'image', m.image
         )
-        FROM metadata m
-        WHERE m.id = p."metadataId"
-      ) AS metadata_info
-  
-    FROM 
-      posts p 
-      JOIN users u ON p."userId" = u.id
-      LEFT JOIN shares s ON s."postId" = p.id
-  
-    WHERE u.id = ${id}
+        FROM likes l
+        JOIN users u2 ON l."userId" = u2.id
+        WHERE l."postId" = p.id
+      ),
+      '[]'
+    ) AS liked_by_users,
 
-    GROUP BY
-      p.id,
-      s.id,
-      u.id
-  
-    ORDER BY 
-      p.created_at DESC 
-  
-    LIMIT 20;
-        `
+    (SELECT COUNT(*) FROM shares s2 WHERE s2."postId" = s."postId") AS shares_count,
+
+    COALESCE(
+      (SELECT
+        JSON_AGG(
+          JSON_BUILD_OBJECT(
+            'commenter_id', c."userId", 
+            'commenter_name', u3.name,
+            'commenter_image', u3."imageUrl",
+            'comment', c."commentText"
+          )
+        )
+        FROM comments c
+        JOIN users u3 ON c."userId" = u3.id
+        WHERE c."postId" = p.id
+      ),
+      '[]'
+    ) AS commented_by_users,
+
+    (SELECT 
+      JSON_BUILD_OBJECT(
+        'id', m.id,
+        'title', m.title,
+        'description', m.description,
+        'url', m.url,
+        'image', m.image
+      )
+      FROM metadata m
+      WHERE m.id = p."metadataId"
+    ) AS metadata_info
+
+  FROM 
+    posts p 
+    JOIN users u ON p."userId" = u.id
+    JOIN followers f ON p."userId" = f.followed
+    LEFT JOIN shares s ON s."postId" = p.id
+  WHERE u.id = ${id}
+
+  GROUP BY
+    p.id,
+    s.id,
+    u.id
+
+  ORDER BY 
+    p.id DESC,
+    p.created_at DESC
+
+  LIMIT 20;
+    `
   );
 }
 
@@ -229,7 +221,7 @@ export async function getAllPosts(id) {
       '[]'
     ) AS liked_by_users,
 
-    CAST(COUNT(s.id) AS INTEGER)AS shares_count,
+    (SELECT COUNT(*) FROM shares s2 WHERE s2."postId" = s."postId") AS shares_count,
 
     COALESCE(
       (SELECT
