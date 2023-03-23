@@ -52,7 +52,7 @@ export async function getAllShares(id) {
       '[]'
     ) AS liked_by_users,
 
-    CAST(COUNT(s1.id) AS INTEGER)AS shares_count,
+    CAST(COUNT(s.id) AS INTEGER)AS shares_count,
 
     COALESCE(
       (SELECT
@@ -84,17 +84,30 @@ export async function getAllShares(id) {
     ) AS metadata_info
 
   FROM 
-    shares s 
-    JOIN posts p ON s."postId" = p.id
+    posts p 
     JOIN users u ON p."userId" = u.id
-    JOIN followers f ON p."userId" = f.followed
-    JOIN followers f2 ON s."userId" = f2.followed
-    JOIN shares s1 ON s1."postId" = p.id
-  WHERE f.following = ${id}
+    JOIN shares s ON s."postId" = p.id
+  WHERE
+        p."userId" = ${id} OR
+        p."userId" IN (
+          SELECT f2.followed
+          FROM followers f2
+          WHERE f2.following = ${id}
+        ) OR
+        p."userId" IN (
+          SELECT f2.following
+          FROM followers f2
+          WHERE f2.followed = ${id}
+        ) OR
+        s."userName" IN (
+          SELECT u.name
+          FROM users u
+          JOIN followers f2 ON u.id = f2.followed
+          WHERE f2.following = ${id}
+        )
 
   GROUP BY
     p.id,
-    s1.id,
     s.id,
     u.id
 
@@ -103,7 +116,7 @@ export async function getAllShares(id) {
 
   LIMIT 20;
     `
-    )
+  )
 }
 
 export async function insertLike(userId, postId) {
@@ -128,7 +141,7 @@ export async function getPostById(postId) {
 
 export async function getPostsFromUserRepository(id) {
   return await connection.query(
-      `
+    `
       SELECT p.id AS post_id, p.description AS post_description, u.id AS user_id, u.name AS user_name, u."imageUrl" AS user_image_url,
       COALESCE(
         (SELECT
@@ -200,10 +213,10 @@ export async function getAllPosts(id) {
 
   return await connection.query(
     `
-    SELECT p.id AS post_id, p.description AS post_description, u.id AS user_id, u.name AS user_name, u."imageUrl" AS user_image_url, p.created_at,
+    SELECT DISTINCT ON(p.id) p.id AS post_id, p.description AS post_description, u.id AS user_id, u.name AS user_name, u."imageUrl" AS user_image_url, p.created_at,
     COALESCE(
       (SELECT
-        JSON_AGG(
+        JSONB_AGG(
           JSON_BUILD_OBJECT(
             'user_id', l."userId", 
             'user_name', u2.name
@@ -260,20 +273,21 @@ export async function getAllPosts(id) {
     u.id
 
   ORDER BY 
-    p.created_at DESC 
+    p.id DESC,
+    p.created_at DESC
 
   LIMIT 20;
     `
-    )
+  )
 }
 
-export async function commentPostRepository(postId, userId, comment){
+export async function commentPostRepository(postId, userId, comment) {
   return await connection.query(
     `INSERT INTO comments ("postId", "userId", "commentText") VALUES ($1,$2,$3)`,
     [postId, userId, comment]
   );
 }
- 
+
 export async function deletePostRepository(postId, userId) {
   console.log(Number(postId), userId);
 
