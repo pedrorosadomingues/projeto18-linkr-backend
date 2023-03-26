@@ -7,7 +7,7 @@ async function validateSignup(request, response, next) {
   try {
     const validation = signupSchema.validate(user);
 
-    console.log('Validation:', validation)
+    //console.log('Validation:', validation)
 
     if (validation.error) {
       console.log('Error on signup validation: ', validation.error.message);

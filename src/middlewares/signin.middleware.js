@@ -7,7 +7,7 @@ async function validateSignin(request, response, next) {
   try {
     const validation = signinSchema.validate(user);
 
-    console.log(validation)
+    //console.log(validation)
 
     if (validation.error) {
       console.log('Error on signin validation: ', validation.error.message);
