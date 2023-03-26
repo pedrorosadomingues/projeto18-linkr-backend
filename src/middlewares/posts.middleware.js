@@ -88,7 +88,7 @@ export async function scrapMetadata(_, res, next){
         })
     } else {
       res.locals.metadataId = metadata.rows[0].id;
-      console.log(res.metadataId)
+      //console.log(res.metadataId)
     }
     next();
   } catch (err) {

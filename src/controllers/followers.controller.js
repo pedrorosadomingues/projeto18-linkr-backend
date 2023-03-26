@@ -52,15 +52,15 @@ export async function unfollow(request, response) {
 
 export async function isFollowing(request, response) {
   const { id } = request.body;
-  console.log('body from isfollowing: ', request.body);
+  //console.log('body from isfollowing: ', request.body);
 
-  console.log('')
+  //console.log('')
 
   const user = response.locals.user;
 
   try {
     const data = await getIsFollowingRepository(id, user.id);
-    console.log('ISFOLLOWING:', data.rows);
+    //console.log('ISFOLLOWING:', data.rows);
 
     return response.status(OK).send({isFollowing: data.rows.length > 0});
   } catch (error) {

@@ -24,7 +24,7 @@ export async function getPosts(_, res) {
   const { rows: postRows } = await getAllPosts(id);
   const { rows: sharesRows } = await getAllShares(id);
 
-  console.log('sharesRows', sharesRows)
+  //console.log('sharesRows', sharesRows)
 
   const feed = [...postRows, ...sharesRows].sort((a, b) => b.created_at - a.created_at);
 
@@ -74,7 +74,7 @@ export async function updatePost(request, response) {
     const { id: postId } = request.params;
     const { id: userId } = response.locals.user;
 
-    console.log(text)
+    //console.log(text)
 
     await updatePostRepository(postId, userId, text);
 
@@ -123,9 +123,9 @@ export async function sharePost(_, res) {
 
   const user = res.locals.user;
   const post = res.locals.post;
-  console.log('USER NAME', user.name)
-  console.log('USER ID', user.id)
-  console.log('****************************************')
+  //console.log('USER NAME', user.name)
+  //console.log('USER ID', user.id)
+  //console.log('****************************************')
 
   try {
     await insertShare(user.id, user.name, post.id);
