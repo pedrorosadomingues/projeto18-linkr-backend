@@ -257,7 +257,7 @@ export async function getAllPosts(id) {
     JOIN users u ON p."userId" = u.id
     JOIN followers f ON p."userId" = f.followed
     LEFT JOIN shares s ON s."postId" = p.id
-  WHERE f.following = ${id}
+  WHERE f.following = ${id} OR p."userId" = ${id}
 
   GROUP BY
     p.id,
